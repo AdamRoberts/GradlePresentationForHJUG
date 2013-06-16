@@ -1,0 +1,36 @@
+class ConfigurableGreetingTask extends DefaultTask {
+
+    def String person = 'World'
+
+    @TaskAction
+    def greet() {
+        println "Hello ${person}!"
+    }
+}
+
+task helloWorld(type: ConfigurableGreetingTask)
+
+task helloDuke(type: ConfigurableGreetingTask) {
+    person = 'Duke'
+}
+
+task version1(type: ConfigurableGreetingTask) {
+    person = 'Duke'
+    doFirst() {
+        println 'Hello Everyone!'
+    }
+    doLast() {
+        println "I hope you are having a good day ${person}"
+    }
+}
+
+
+task version2(type: ConfigurableGreetingTask)
+version2.person = 'Duke'
+version2.doFirst() {
+    println 'Hello Everyone!'
+}
+version2 << {
+    println "I hope you are having a good day ${person}"
+}
+

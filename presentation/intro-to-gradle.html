@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Introduction to Gradle</title>
+
+        <meta name="description" content="An introduction to the Gradle build automation tool">
+        <meta name="author" content="Adam Roberts">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+    </head>
+
+    <body>
+        <div class="reveal">
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <a href="http://www.gradle.org/" class="image">
+                        <img width="45%" src="img/gradle/gradle_logo.gif" alt="Gradle Logo">
+                    </a>
+                    <h3>Automation Evolved</h3>
+                    <p>
+                        <small>Open Source by <a href="http://www.gradleware.com/">Gradleware</a> (Apache 2.0 license)</small>
+                    </p>
+                </section>
+                <section>
+                    <h2>Topics Covered</h2>
+                    <ol>
+                        <li class="fragment"><code>Why another build tool</code></li>
+                        <li class="fragment"><code>Gradle's Anatomy</code></li>
+                        <li class="fragment"><code>Example builds</code></li>
+                    </ol>
+
+                    <aside class="notes">
+                    </aside>
+                </section>
+                <section>
+                    <h2>Topics Not Covered</h2>
+                    <ol>
+                        <li class="fragment"><code>Groovy</code></li>
+                        <li class="fragment"><code>Sub-Projects</code></li>
+                        <li class="fragment"><code>Plugin Development</code></li>
+                    </ol>
+
+                    <aside class="notes">
+                    </aside>
+                </section>
+                <section>
+                    <h2>Build Enabler</h2>
+                    <ol>
+                        <li class="fragment"><code>Defaults to Maven conventions</code></li>
+                        <li class="fragment"><code>Full integration with Ant</code></li>
+                        <li class="fragment"><code>DSL in <a href="http://groovy.codehaus.org/">Groovy</a></code></li>
+                        <li class="fragment"><code>Flexible dependency management</code></li>
+                    </ol>
+
+                    <aside class="notes">
+                        When setting up a build using gradle it defaults to using the Maven directory structure.
+                        But unlike maven gradle allows the source directories to be reconfigured to whatever structure
+                        you desire.
+
+                        Gradle has full support of ant builds, it can import and use custom ant tasks, it can import a build
+                        file to call or modify the targets.  Gradle builds can also be called from an Ant build file.  this means
+                        that it is easy to slowly convert an ant build to a gradle build one target at a time.
+
+                        So if Maven and Ant are to great why do we need a new tool, one reason is because xml sucks
+
+                        Rather than declaring you build steps in xml, Gradle uses Groovy as a DSL.  This allows gradle builds
+                        to be easier to read and write than their xml counterparts.  While having the full power of groovy means
+                        that custom build steps become trivial to implement in the build rather than requireing a new custom task
+                        be writen.
+
+                        Gradle has a powerful transitive dependency resolution system that allows the use of maven or ivy
+                        remote repositories.  Or local file repositories, or just direct file references.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Gradle Projects</h2>
+                    <ul>
+                        <li class="fragment"><code>"build.gradle" configures the project</code></li>
+                        <li class="fragment"><code>Project provides the base DSL</code></li>
+                        <li class="fragment"><code>Build steps are performed by Tasks</code></li>
+                        <li class="fragment"><code>Plugins provide preconfigured tasks</code></li>
+                    </ul>
+
+                    <aside class="notes">
+                        A completely empty file that is named "build.gradle" is a valid build configuration.  It doesn't
+                        do anything, but gradle will execute without errors.
+
+                        The project class provides nouns to configure the project in a declarative manner.  nouns such as
+                        "configuration", "task", "file", "dependencies", "artifacts".
+
+                        The project class also provides verbs to make it easier to create custom imperative behavior.  verbs
+                        such as "copy", "delete", "javaexec", "exec"
+
+                        You can add a single task manually or you can apply a plugin
+
+                        Plugins add a set of preconfigured  interrelated tasks
+
+                        A task has an action that it performs to complete its portion of the build.
+
+                        Tasks are arranged in an Directed acyclic graph that ensures tasks are executed in the correct
+                        order.
+
+
+                    </aside>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>Tasks perform an action</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">class GreetingTask extends DefaultTask {
+    @TaskAction
+    def greet() {
+        println 'Hello World!'
+    }
+}</code></pre>
+
+                        <div class="fragment">
+                            <code>Adding the task to you build</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">task hello(type: GreetingTask)</code></pre>
+                        </div>
+
+                        <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle hello
+:hello
+Hello World!
+
+BUILD SUCCESSFUL</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            A task has an action that it performs to complete its portion of the build.   Although the action
+                            is technicaly optional, a task without without an action does not provide much value.
+
+                            The actual class definition can be created inline in your buid script, or it can be in a seperate
+                            script file that is imported, or it can be compiled to bytecode in a jar on the classpath.
+
+                            The named task instance does need to be created in your build script, although the majority of
+                            your build tasks will be created by applying plugins rather than manually.
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>Tasks dependencies control build order</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">task helloAgain(type: GreetingTask, dependsOn: hello)</code></pre>
+
+                        <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle helloAgain
+:hello
+Hello World!
+:helloAgain
+Hello World!
+
+BUILD SUCCESSFUL</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            Tasks use dependencies on other tasks to control the order of the build.  These dependencies
+                            create a Directed acyclic graph that ensures the build will end.  If you define a loop of
+                            dependencies gradle will exclude all tasks in the loop from execution.
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>Add functions to "Do First"</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">task redundantGreeting(type: GreetingTask) {
+    doFirst {
+        println 'Hello Hello Hello'
+    }
+}</code></pre>
+
+                        <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle redundantGreeting
+:redundantGreeting
+Hello Hello Hello
+Hello World!
+
+BUILD SUCCESSFUL</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            The list of functions in the "doFirst" can be empty.  Any functions in the list will be executed
+                            prior to the execution of the task action.  Currently the list is executed in the order that the
+                            functions are added, however depending on this behavior would lead to a fragile build, if they
+                            are order dependent make them an independent task and use dependsOn.
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>Add functions to "Do Last"</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">task helloAndGoodBye(type: GreetingTask) {
+    doLast {
+        println 'Goodbye World'
+    }
+}</code></pre>
+
+                        <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle helloAndGoodbye
+:helloAndGoodBye
+Hello World!
+Goodbye World
+
+BUILD SUCCESSFUL</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            "doLast" behaves exactly the same as the "doFirst" list except they all execute after the task
+                            action.  "doLast" does have an additional DSL syntax in the "%lt;%lt;" operator.
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>Tasks can be configurable</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">class ConfigurableGreetingTask extends DefaultTask {
+    def person = 'World'
+    @TaskAction
+    def greet() {
+        println "Hello ${person}!"
+    }
+}
+
+task helloDuke(type: ConfigurableGreetingTask) {
+    person = 'Duke'
+}</code></pre>
+
+                       <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle helloDuke
+:helloDuke
+Hello Duke!
+
+BUILD SUCCESSFUL</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            This task using a public member its configuration setup is a gross oversimplification of how
+                            most tasks are configured as most tasks belong to a family of tasks that share a common
+                            configuration object.  But this presentation's goal is not custom task development, it is just
+                            to have an understanding of how the gradle lifecycle works so you can make better use of the tool.
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>The DSL is flexible</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">task version1(type: ConfigurableGreetingTask) {
+    person = 'Duke'
+    doFirst() {
+        println 'Hello Everyone!'
+    }
+    doLast() {
+        println "I hope you are having a good day ${person}"
+    }
+}</code></pre>
+
+                       <div class="fragment">
+                            <code>Identical</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">task version2(type: ConfigurableGreetingTask)
+version2.person = 'Duke'
+version2.doFirst() {
+    println 'Hello Everyone!'
+}
+version2 << {
+    println "I hope you are having a good day ${person}"
+}</code></pre>
+                        </div>
+
+                        <aside class="notes">
+                            The gradle dsl is designed to be a truely fluent language, this also means that there are
+                            multiple ways to accomplish the same configuration.
+                        </aside>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Artifact Dependency Management</h2>
+                        <code>Configurations</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">configurations {</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    runtime {
+        description = "Used at runtime but should not be inherited"
+        extendsFrom compile
+        transitive = false
+    }</code></pre>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">}</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">configurations.compile {
+    description = 'You can access an already declared configuration'
+}</code></pre>
+
+                        <aside class="notes">
+                            Creating a new configuration is easy
+
+                            You can extend an existing configuration to inherit the dependencies
+
+                            You can easily access an already created configuration
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Artifact Dependency Management</h2>
+                        <code>Dependency Declarations</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">dependencies {</code></pre>
+
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile 'org.slf4j:slf4j-api:1.7.5'</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile('javax.servlet:javax.servlet-api:3.0.1') {
+        transitive = false
+    }</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    runtime 'org.slf4j:slf4j-log4j12:1.7.5'</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile files('libs/a.jar', 'libs/b.jar')</code></pre>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">}</code></pre>
+
+                        <aside class="notes">
+                            slf4j will be accessed from a declared repository and made available to any task that
+                            uses the compile dependency
+
+                            when the configuration's settings need to be overriden for a single artifact they can be
+
+                            File dependencies are never transitive
+
+                            now that we have used the configurations you can see how each one cooresponds to a seperate
+                            classpath
+                        </aside>
+                    </section>
+                    <section>
+                        <h2>Artifact Dependency Management</h2>
+                        <code>Repository Setup</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">repositories {</code></pre>
+
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    mavenCentral()</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    maven { url "http://repo.mycompany.com/maven2" }</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    ivy { url "http://repo.mycompany.com/repo" }</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    flatDir { dirs 'lib1', 'lib2' }</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    localRepository { dirs 'lib' }</code></pre>
+
+                        <pre><code style="font-size: 18px; margin-top: 20px;">}</code></pre>
+
+                        <aside class="notes">
+
+                        </aside>
+                    </section>
+                </section>
+
+                <section>
+                  <section>
+                      <h2>Plugins</h2>
+                      <code>To use a plugin:</code>
+                      <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">apply plugin: 'example-plugin'</code></pre>
+                      <code class="fragment">The plugin then:</code>
+                      <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">configurations {
+    pluginConf
+}</code></pre>
+                      <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">class PluginTask extends DefaultTask {
+    @TaskAction
+    def action() {
+        def deps = project.configurations.pluginConf.allDependencies
+        ... do something ...
+    }
+}
+</code></pre>
+                      <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">task pluginTask(type: PluginTask)</code></pre>
+
+                      <aside class="notes">
+                      </aside>
+                  </section>
+                  <section>
+                      <h2>The Java Plugin</h2>
+                      <a href="http://www.gradle.org/docs/current/userguide/java_plugin.html#N11FD5" class="image">
+                        <img width="120%" src="img/gradle/javaPluginTasks.png" alt="The Java Plugin Task graph">
+                      </a>
+
+                      <aside class="notes">
+                        Figure out how to make the image either bigger or scrollable
+                      </aside>
+                  </section>
+                  <section>
+                      <h2>Project Extensions</h2>
+                      <code>Source Sets</code>
+                      <pre><code style="font-size: 18px; margin-top: 20px;">apply plugin: 'java'
+
+sourceSets {
+    newCode
+}</code></pre>
+
+                      <div class="fragment">
+                        <code>New Tasks</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle tasks --all
+:tasks
+
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+...
+newCodeClasses - Assembles binary 'newCode'.
+...
+    compileNewCodeJava - Compiles source set 'newCode:java'.
+    processNewCodeResources - Processes source set 'newCode:resources'.
+...
+BUILD SUCCESSFUL</code></pre>
+                      </div>
+
+                      <aside class="notes">
+                        When a "most" language plugins are applied, they modify the project object to add a "sourcesets"
+                        noun to the DSL.
+                      </aside>
+                  </section>
+                  <section>
+                      <h2>Built in plugins *</h2>
+                      <ul>
+                        <li><strong>Language plugins</strong> - Java, Scala, Groovy, Antlr, cpp</li>
+                        <li><strong>Integration plugins</strong> - war, jetty, ear, osgi, maven</li>
+                        <li><strong>Code Quality</strong> - checkstyles, codenarc, findbugs, jdepend, pmd</li>
+                        <li><strong>Development Support</strong> - sonar, eclipse, idea</li>
+                      </ul>
+
+                      <aside class="notes">
+                        Plugins provide tasks to accomplish the specific build goals
+                        Plugins are used to add a set of interrelated tasks
+                        A task has an action that it performs to complete its portion of the build.
+                      </aside>
+                  </section>
+                </section>
+
+                <section>
+                  <section>
+                      <h2>Build Lifecycle</h2>
+                      <ul>
+                        <li class="fragment"><strong>Initialization</strong> - find all the files</li>
+                        <li class="fragment"><strong>Configuration</strong> - parse the build file's configuration</li>
+                        <li class="fragment"><strong>Execution</strong> - execute the task graph</li>
+                      </ul>
+
+                      <aside class="notes">
+                          During the initialization phase Gradle locates every build file (build.gradle, settings.gradle,
+                          gradle.properties, subprojects) and instantiates a project instance for every build.
+
+                          During the configuration phase every build file is parsed, and the configuration is executed.
+
+                          During the Execution phase the task graph is executed up to the task specified on the command line (or default)
+                      </aside>
+                  </section>
+                  <section>
+                      <code>Manual Webapp Setup</code>
+                      <pre><code style="font-size: 18px; margin-top: 20px;">jettyRun {
+    copy {
+        from 'src/bdd/resources/web.xml'
+        into "${buildDir}/webapp/WEB-INF"
+    }
+}</code></pre>
+
+                      <div class="fragment">
+                        <code>Fixed</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">jettyRun {
+    doFirst {
+        copy {
+            from 'src/bdd/resources/web.xml'
+            into "${buildDir}/webapp/WEB-INF"
+        }
+    }
+}</code></pre>
+                      </div>
+
+                      <aside class="notes">
+                        The common mistake is the copy will always occur, even if the jettyRun task is not executed.
+                      </aside>
+                  </section>
+                </section>
+
+                <section>
+                  <h2>Examples</h2>
+                </section>
+            </div>
+
+            <div id="footer"
+                 style="text-align:left;
+                        font-size: 0.45em;
+                        position: fixed;
+                        width: 100%;
+                        left: 20px;
+                        bottom: 20px;
+                        z-index: 10;
+                       ">
+              Presentation by <a href="mailto:ARoberts@Alum.RIT.edu">Adam Roberts</a> for the <a href="http://www.hjug.org">Houston Java Users Group</a>
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+
+        <script>
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

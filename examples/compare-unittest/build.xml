@@ -1,0 +1,62 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="Basic" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+    <!-- set global properties for this build -->
+    <property name="src" location="src/main/java" />
+    <property name="build" location="antBuild" />
+    <property name="classes" location="${build}/classes" />
+    <property name="tests" location="${build}/tests" />
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp />
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}" />
+        <mkdir dir="${classes}" />
+        <mkdir dir="${tests}" />
+    </target>
+
+    <target name="resolve" description="--> retrieve dependencies with ivy">
+        <ivy:retrieve />
+    </target>
+
+    <target name="compile" depends="init, resolve" description="compile the source ">
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${classes}" />
+    </target>
+
+    <target name="compile-tests" description="Compile test Classes" depends="compile">
+        <ivy:cachepath conf="test" pathid="test.refid" />
+        <javac srcdir="src/test/java" destdir="${tests}" classpath="${classes}" classpathref="test.refid" />
+    </target>
+
+    <target name="unittest" description="Execute unit tests" depends="compile-tests">
+        <ivy:cachepath conf="test" pathid="test.refid" />
+        <mkdir dir="${build}/tmp/rawtestoutput" />
+        <junit printsummary="true" failureproperty="junit.failure">
+            <classpath refid="test.refid" />
+            <classpath path="${classes}:${tests}" />
+            <test name='HelloTest'/>
+        </junit>
+        <junitreport todir="${build}/tmp">
+            <fileset dir="${build}/tmp/rawtestoutput" />
+            <report todir="${build}/test-reports" />
+        </junitreport>
+        <fail if="junit.failure" message="Unit test(s) failed.  See reports!" />
+      </target>
+
+    <target name="dist" depends="compile, unittest" description="generate the distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${build}/lib" />
+
+        <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+        <jar jarfile="${build}/lib/${ant.project.name}.jar" basedir="${classes}" />
+    </target>
+
+    <target name="clean" description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+    </target>
+</project>

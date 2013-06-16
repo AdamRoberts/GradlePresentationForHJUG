@@ -1,0 +1,21 @@
+class GreetingTask extends DefaultTask {
+    @TaskAction
+    def greet() {
+        println 'Hello World!'
+    }
+}
+
+task hello(type: GreetingTask)
+
+task helloAgain(type: GreetingTask, dependsOn: hello)
+
+task redundantGreeting(type: GreetingTask) {
+    doFirst {
+        println 'Hello Hello Hello'
+    }
+}
+
+task helloAndGoodBye(type: GreetingTask) << {
+    println 'Goodbye World'
+}
+

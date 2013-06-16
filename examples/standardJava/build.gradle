@@ -1,0 +1,60 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'project-report'
+apply plugin: 'eclipse'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+
+defaultTasks 'all'
+
+task all (dependsOn: [jacocoTestReport, projectReport, build])
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    description = 'The source for this module for use in IDEs'
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+    description = 'The javadoc for this module for use in IDEs'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+    archives javadocJar
+}
+
+uploadArchives {
+    dependsOn check
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        repository(url: "http://www.hjug.org/libs-snapshost-local")
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.6'
+}
+
+eclipse {
+    classpath {
+        defaultOutputDir = file('eclipseBin')
+    }
+}
+

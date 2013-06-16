@@ -1,0 +1,6 @@
+task loop1(type: DefaultTask, dependsOn: 'loop3')
+
+task loop2(type: DefaultTask, dependsOn: loop1)
+
+task loop3(type: DefaultTask, dependsOn: loop2)
+
