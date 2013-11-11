@@ -1,0 +1,18 @@
+// Senario:  You need to copy all of the xml files from "src/main/resources" directory into
+//           your "build/tmp/testApp" folder before starting a suite of integration tests
+//
+// Hint: google "gradle copy dsl"
+//   or: google "gradle project dsl" check the methods section
+
+task copyConfiguration {
+    description = "Copies all of the xml configuration files into the build/tmp/testApp folder"
+
+    // TODO implement the task
+
+    // Check if the task implementation worked
+    doLast() {
+        assert file("${buildDir}/tmp/testApp/configuration.xml").exists()
+        assert file("${buildDir}/tmp/testApp/com/prosrm/sub-config.xml").exists()
+        assert !file("${buildDir}/tmp/testApp/com/prosrm/sub-config.properties").exists()
+    }
+}

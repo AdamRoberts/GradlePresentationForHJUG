@@ -1,0 +1,11 @@
+task cleanUp {
+    doFirst() {
+        println 'Cleanup executed'
+    }
+}
+task fails {
+    finalizedBy cleanUp
+    doFirst() {
+        throw new RuntimeException()
+    }
+}

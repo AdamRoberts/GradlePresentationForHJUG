@@ -1,0 +1,63 @@
+// Senario:  You need to unpack a copy of Tomcat from a dependency so that a web application can
+//           be tested running inside Tocmat
+//
+// Hint #1: On the "project" dsl page search for "zipTree"
+// Hint #2: Search the "Configuration" API document for singleFile
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    tomcat
+}
+
+dependencies {
+    tomcat group: 'com.googlecode.t7mp', name: 'tomcat', version: '7.0.37'
+}
+
+task unpackTomcat {
+    description = "Extracts the complete contents of the Tomcat artifact into build/testApp"
+
+    // TODO implement the task
+
+    // Check if the task implementation worked
+    doLast() {
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin/bootstrap.jar").exists()
+    }
+}
+
+task unpackTomcatSolution1 {
+    description = "Extracts the complete contents of the Tomcat artifact into build/testApp"
+
+    doFirst() {
+        copy {
+            from zipTree(project.configurations.tomcat.singleFile)
+            into "${buildDir}/testApp"
+        }
+    }
+
+    // Check if the task implementation worked
+    doLast() {
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin/bootstrap.jar").exists()
+    }
+
+}
+
+task unpackTomcatSolution2(type: Copy) {
+    description = "Extracts the complete contents of the Tomcat artifact into build/testApp"
+
+    from zipTree(configurations.tomcat.singleFile)
+    into "${buildDir}/testApp"
+
+    // Check if the task implementation worked
+    doLast() {
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin").exists()
+        assert file("${buildDir}/testApp/apache-tomcat-7.0.37/bin/bootstrap.jar").exists()
+    }
+}

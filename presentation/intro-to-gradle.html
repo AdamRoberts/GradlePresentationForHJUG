@@ -34,6 +34,7 @@
                         <small>Open Source by <a href="http://www.gradleware.com/">Gradleware</a> (Apache 2.0 license)</small>
                     </p>
                 </section>
+<!--
                 <section>
                     <h2>Topics Covered</h2>
                     <ol>
@@ -56,13 +57,16 @@
                     <aside class="notes">
                     </aside>
                 </section>
+-->
                 <section>
-                    <h2>Build Enabler</h2>
+                    <h2>Why another build tool</h2>
+                    <h3 class="fragment">Build Enabler</h2>
                     <ol>
                         <li class="fragment"><code>Defaults to Maven conventions</code></li>
                         <li class="fragment"><code>Full integration with Ant</code></li>
                         <li class="fragment"><code>DSL in <a href="http://groovy.codehaus.org/">Groovy</a></code></li>
                         <li class="fragment"><code>Flexible dependency management</code></li>
+                        <li class="fragment"><code>Automation as well as build</code></li>
                     </ol>
 
                     <aside class="notes">
@@ -83,7 +87,20 @@
 
                         Gradle has a powerful transitive dependency resolution system that allows the use of maven or ivy
                         remote repositories.  Or local file repositories, or just direct file references.
+
+                        Ant and Maven are custom designed for a build process.  Gradle is designed to automate tasks,
+                        it has full support for automating a build procesws, but it also has an expanding role
+                        in automation of test suites and even some deployment tools.
                     </aside>
+                </section>
+                <section>
+                    <h2>Gradle's Anatomy</h2>
+                    <ul class="fragment">
+                        <li><code>Projects</code></li>
+                        <li><code>Tasks</code></li>
+                        <li><code>Dependency Resolution</code></li>
+                        <li><code>Lifecycle</code></li>
+                    </ul>
                 </section>
                 <section>
                     <h2>Gradle Projects</h2>
@@ -155,7 +172,7 @@ BUILD SUCCESSFUL</code></pre>
                     </section>
                     <section>
                         <h2>Anatomy of a Task</h2>
-                        <code>Tasks dependencies control build order</code>
+                        <code>Tasks dependencies control execution order</code>
                         <pre><code style="font-size: 18px; margin-top: 20px;">task helloAgain(type: GreetingTask, dependsOn: hello)</code></pre>
 
                         <div class="fragment">
@@ -286,6 +303,30 @@ version2 << {
                             multiple ways to accomplish the same configuration.
                         </aside>
                     </section>
+                    <section>
+                        <h2>Anatomy of a Task</h2>
+                        <code>A task can be "finalized By" another task (incubating)</code>
+                        <pre><code style="font-size: 18px; margin-top: 20px;">task cleanUp {
+    doFirst() { println 'Cleanup executed' }
+}
+task fails {
+    finalizedBy cleanUp
+    doFirst() { throw new RuntimeException() }
+}</code></pre>
+
+                        <div class="fragment">
+                            <code>Task output</code>
+                            <pre><code style="font-size: 18px; margin-top: 20px;">$ gradle fails
+:fails FAILED
+:cleanUp
+Cleanup executed
+
+FAILURE: Build failed with an exception.
+...</code></pre>
+                        </div>
+
+                        <aside class="notes"></aside>
+                    </section>
                 </section>
 
                 <section>
@@ -297,7 +338,6 @@ version2 << {
                         <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    runtime {
         description = "Used at runtime but should not be inherited"
         extendsFrom compile
-        transitive = false
     }</code></pre>
                         <pre><code style="font-size: 18px; margin-top: 20px;">}</code></pre>
                         <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">configurations.compile {
@@ -318,11 +358,13 @@ version2 << {
                         <pre><code style="font-size: 18px; margin-top: 20px;">dependencies {</code></pre>
 
                         <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile 'org.slf4j:slf4j-api:1.7.5'</code></pre>
-                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile('javax.servlet:javax.servlet-api:3.0.1') {
-        transitive = false
-    }</code></pre>
                         <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    runtime 'org.slf4j:slf4j-log4j12:1.7.5'</code></pre>
+                        <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    runtime group: 'org.apache', name: 'tomcat', version: '7.0.34', ext: 'zip'</code></pre>
                         <pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile files('libs/a.jar', 'libs/b.jar')</code></pre>
+<pre class="fragment"><code style="font-size: 18px; margin-top: 20px;">    compile("com.sun.jersey:jersey-json:1.12") {
+        exclude group: 'stax', module: 'stax-api'
+    }</code></pre>
+
                         <pre><code style="font-size: 18px; margin-top: 20px;">}</code></pre>
 
                         <aside class="notes">

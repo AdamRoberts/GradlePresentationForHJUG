@@ -1,0 +1,54 @@
+// Senario:  You need to execute a JMeter test to ensure that Google still works.
+//           The task to download and unpack JMeter has already been written for you.
+//
+//
+// JMeter Command Line call:
+//     java -jar ApacheJMeter.jar -n -t test.jmx -l logfile.log
+//
+// So the Command to Execute is:
+//     java -jar ${jmeterDir}/bin/ApacheJMeter.jar -n -t testGoogle.jmx -l ${buildDir}/reports/jmeter/run.log
+//
+// Hint #1: Must execute the java command from ${jmeterDir}/bin
+// Hint #2: google "gradle JavaExec dsl" or google "gradle project dsl" check the methods section
+// Hint #3: execute gradle with the "--info" flag will output the call currently being used
+// Hint #4: Outstanding bug in Gradle, the main class to execute will actually be "-jar" (see http://issues.gradle.org/browse/GRADLE-1274)
+
+def tmpDir = file("${buildDir}/tmp")
+def jmeterDir = file("${tmpDir}/apache-jmeter-2.10/")
+def jmeterJar = file("${jmeterDir}/bin/ApacheJMeter.jar")
+
+task runJMeter {
+    description = "This runs the JMeter suite"
+    dependsOn 'downloadJMeter'
+
+    // TODO implement the task
+
+    // Check if the task implementation worked
+    doLast() {
+        assert file("${buildDir}/reports/jmeter/run.log").exists()
+        assert file("${buildDir}/reports/jmeter/jmeter.csv").exists()
+    }
+}
+
+task downloadJMeter {
+    description = "This task ensures that JMeter has been downloaded and unpacked"
+    doFirst() {
+        if (!jmeterJar.exists())
+        {
+            def url = "http://www.eng.lsu.edu/mirrors/apache/jmeter/binaries/apache-jmeter-2.10.tgz"
+            def jmeterTarBall = file("${tmpDir}/apache-jmeter-2.10.tgz")
+            if (!jmeterTarBall.exists()) {
+                tmpDir.mkdirs()
+                OutputStream out = jmeterTarBall.newDataOutputStream()
+                out << new URL(url).openStream()
+                out.close()
+            }
+            assert jmeterTarBall.exists()
+            copy {
+                from tarTree(resources.gzip(jmeterTarBall))
+                into tmpDir
+            }
+        }
+        assert jmeterJar
+    }
+}

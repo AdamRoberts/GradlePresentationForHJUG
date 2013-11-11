@@ -18,4 +18,3 @@ task redundantGreeting(type: GreetingTask) {
 task helloAndGoodBye(type: GreetingTask) << {
     println 'Goodbye World'
 }
-

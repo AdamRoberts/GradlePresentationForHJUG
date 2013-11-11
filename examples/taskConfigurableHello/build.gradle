@@ -33,4 +33,3 @@ version2.doFirst() {
 version2 << {
     println "I hope you are having a good day ${person}"
 }
-
