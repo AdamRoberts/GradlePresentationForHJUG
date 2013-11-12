@@ -1,4 +1,4 @@
-// Senario:  You need to unpack a copy of Tomcat from a dependency so that a web application can
+// Scenario:  You need to unpack a copy of Tomcat from a dependency so that a web application can
 //           be tested running inside Tocmat
 //
 // Hint #1: On the "project" dsl page search for "zipTree"

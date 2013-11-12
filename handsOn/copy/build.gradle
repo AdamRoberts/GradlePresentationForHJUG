@@ -1,4 +1,4 @@
-// Senario:  You need to copy all of the xml files from "src/main/resources" directory into
+// Scenario:  You need to copy all of the xml files from "src/main/resources" directory into
 //           your "build/tmp/testApp" folder before starting a suite of integration tests
 //
 // Hint: google "gradle copy dsl"

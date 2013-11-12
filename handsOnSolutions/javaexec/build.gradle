@@ -1,4 +1,4 @@
-// Senario:  You need to execute a JMeter test to ensure that Google still works.
+// Scenario:  You need to execute a JMeter test to ensure that Google still works.
 //           The task to download and unpack JMeter has already been written for you.
 //
 //
