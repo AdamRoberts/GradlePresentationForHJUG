@@ -35,12 +35,11 @@ task downloadJMeter {
     doFirst() {
         if (!jmeterJar.exists())
         {
-            def url = "http://www.eng.lsu.edu/mirrors/apache/jmeter/binaries/apache-jmeter-2.10.tgz"
             def jmeterTarBall = file("${tmpDir}/apache-jmeter-2.10.tgz")
             if (!jmeterTarBall.exists()) {
                 tmpDir.mkdirs()
                 OutputStream out = jmeterTarBall.newDataOutputStream()
-                out << new URL(url).openStream()
+                out << new URL(jmeterUrl).openStream()
                 out.close()
             }
             assert jmeterTarBall.exists()

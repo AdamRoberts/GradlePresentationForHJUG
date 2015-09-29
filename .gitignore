@@ -1,3 +1,13 @@
-build/
+**/antBuild/
+**/build/
+**/target/
+examples/convert-maven/build.gradle
+examples/convert-maven/gradle/
+examples/convert-maven/gradlew
+examples/convert-maven/gradlew.bat
+examples/convert-maven/settings.gradle
+examples/compare-unittest/lib/
 .gradle/
-.project
+**/.project
+**/.settings
+

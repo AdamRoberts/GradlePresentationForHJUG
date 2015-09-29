@@ -1,17 +1,27 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
+apply plugin: 'build-dashboard'
 
 defaultTasks 'all'
 
-task all (dependsOn: [jacocoTestReport, projectReport, build])
+task all (dependsOn: [projectReport, build, ]) {
+    finalizedBy buildDashboard
+}
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+check.dependsOn = [
+    test,
+    jacocoTestReport,
+    findbugsMain,
+    pmdMain,
+]
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -34,22 +44,35 @@ task javadocJar(type: Jar, dependsOn:javadoc) {
     from javadoc.destinationDir
 }
 
-artifacts {
-    archives jar
-    archives sourcesJar
-    archives javadocJar
+publish {
+    dependsOn check
 }
 
-uploadArchives {
-    dependsOn check
-    configuration = configurations.archives
-    repositories.mavenDeployer {
-        repository(url: "http://www.hjug.org/libs-snapshost-local")
+publishing {
+    publications {
+        main(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "http://www.hjug.org/libs-snapshost-local"
+            credentials {
+                username = fakeUserName
+                password = fakeUserPassword
+            }
+        }
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
+    gradleVersion = '2.7'
 }
 
 eclipse {

@@ -34,30 +34,6 @@
                         <small>Open Source by <a href="http://www.gradleware.com/">Gradleware</a> (Apache 2.0 license)</small>
                     </p>
                 </section>
-<!--
-                <section>
-                    <h2>Topics Covered</h2>
-                    <ol>
-                        <li class="fragment"><code>Why another build tool</code></li>
-                        <li class="fragment"><code>Gradle's Anatomy</code></li>
-                        <li class="fragment"><code>Example builds</code></li>
-                    </ol>
-
-                    <aside class="notes">
-                    </aside>
-                </section>
-                <section>
-                    <h2>Topics Not Covered</h2>
-                    <ol>
-                        <li class="fragment"><code>Groovy</code></li>
-                        <li class="fragment"><code>Sub-Projects</code></li>
-                        <li class="fragment"><code>Plugin Development</code></li>
-                    </ol>
-
-                    <aside class="notes">
-                    </aside>
-                </section>
--->
                 <section>
                     <h2>Why another build tool</h2>
                     <h3 class="fragment">Build Enabler</h2>
@@ -82,7 +58,7 @@
 
                         Rather than declaring you build steps in xml, Gradle uses Groovy as a DSL.  This allows gradle builds
                         to be easier to read and write than their xml counterparts.  While having the full power of groovy means
-                        that custom build steps become trivial to implement in the build rather than requireing a new custom task
+                        that custom build steps become trivial to implement in the build rather than requiring a new custom task
                         be writen.
 
                         Gradle has a powerful transitive dependency resolution system that allows the use of maven or ivy
@@ -101,6 +77,19 @@
                         <li><code>Dependency Resolution</code></li>
                         <li><code>Lifecycle</code></li>
                     </ul>
+
+                    <aside class="notes">
+                        In this presentation we aren't going to go over how to achieve a specific build or automation task.
+                        Instead we are going to go over how Gradle is structured and what conventions are used in Gradle so that
+                        you can easily understand an existing Gradle build, and how to use the excelent Gradle documentation to
+                        solve whatever task you are working on.
+
+                        Gradle is made up of several basic parts: A Project is a container to organize your build logic. Tasks are
+                        components that actual do the work. Dependency Management isn't really a seperate part but it is so
+                        fundamental to getting anything done it needs to be understood.  The Gradle Lifecycle is slightly different
+                        than other build tools and is a frequent cause of problems for beginners so it definately needs to be
+                        understood.
+                    </aside>
                 </section>
                 <section>
                     <h2>Gradle Projects</h2>
@@ -129,7 +118,6 @@
 
                         Tasks are arranged in an Directed acyclic graph that ensures tasks are executed in the correct
                         order.
-
 
                     </aside>
                 </section>
