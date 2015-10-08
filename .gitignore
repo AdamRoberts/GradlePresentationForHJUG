@@ -9,5 +9,6 @@ examples/convert-maven/settings.gradle
 examples/compare-unittest/lib/
 .gradle/
 **/.project
+**/.classpath
 **/.settings
 

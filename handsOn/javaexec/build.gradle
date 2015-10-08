@@ -14,7 +14,7 @@
 // Hint #4: Outstanding bug in Gradle, the main class to execute will actually be "-jar" (see http://issues.gradle.org/browse/GRADLE-1274)
 
 def tmpDir = file("${buildDir}/tmp")
-def jmeterDir = file("${tmpDir}/apache-jmeter-2.10/")
+def jmeterDir = file("${tmpDir}/apache-jmeter-${jmeterVersion}/")
 def jmeterJar = file("${jmeterDir}/bin/ApacheJMeter.jar")
 
 task runJMeter {
@@ -35,7 +35,7 @@ task downloadJMeter {
     doFirst() {
         if (!jmeterJar.exists())
         {
-            def jmeterTarBall = file("${tmpDir}/apache-jmeter-2.10.tgz")
+            def jmeterTarBall = file("${tmpDir}/apache-jmeter-${jmeterVersion}.tgz")
             if (!jmeterTarBall.exists()) {
                 tmpDir.mkdirs()
                 OutputStream out = jmeterTarBall.newDataOutputStream()

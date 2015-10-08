@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath 'com.eriwen:gradle-js-plugin:1.8.0'
+        classpath 'com.eriwen:gradle-js-plugin:1.12.1'
     }
 }
 
@@ -11,7 +11,7 @@ apply plugin: 'js'
 
 defaultTasks 'all'
 
-task all (dependsOn: ['jshint', 'combineJs', 'minifyJs'])
+task all (dependsOn: ['combineJs', 'minifyJs'])
 
 javascript.source {
     dev {
@@ -21,11 +21,6 @@ javascript.source {
             exclude "*.min.js"
         }
     }
-}
-
-jshint {
-    source = javascript.source.dev.js.files
-    dest = file("${buildDir}/jshint.out")
 }
 
 combineJs {
